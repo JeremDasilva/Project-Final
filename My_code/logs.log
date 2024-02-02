@@ -34488,3 +34488,11 @@ Increase the number of iterations (max_iter) or scale the data as shown in:
 'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
 2024-01-31 16:02:00,208:WARNING:
 'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-02-02 15:33:35,978:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-02-02 15:33:35,979:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-02-02 15:33:35,979:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-02-02 15:33:35,980:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.

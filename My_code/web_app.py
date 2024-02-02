@@ -106,7 +106,11 @@ elif st.sidebar.checkbox('Data visualization') :
     st.markdown('## Data visualization')
     
     options_list = ['Mean Price by Production Year', 
-                    'Distribution of Car Categories', 'c']
+                    'Distribution of Car Categories',
+                    'Distribution of Gearbox types',
+                    'Distribution of Colors',
+                    'Distribution of Fuel type',
+                    'Behavior of the model']
 
     selected_option = st.sidebar.selectbox('What do you want to visualize?', options_list)
 
@@ -128,8 +132,61 @@ elif st.sidebar.checkbox('Data visualization') :
         plt.xlabel('Count')
         plt.ylabel('Category')
         plt.title('Distribution of Car Categories')
-        st.pyplot()      
-    
+        st.pyplot()
+        
+    elif selected_option == options_list[2] :
+        gearbox_count = sales_df['gearbox_type'].value_counts().reset_index()
+        
+        plt.figure(figsize=(8, 8))
+        sns.barplot(x='index', y='gearbox_type', data=gearbox_count)
+        plt.xlabel('Count')
+        plt.ylabel('Gear box')
+        plt.title('Distribution of Gearbox Types')
+        st.pyplot() 
+        
+    elif selected_option == options_list[3] :
+        color_count = sales_df['color'].value_counts().reset_index()
+        
+        plt.figure(figsize=(8, 8))
+        sns.barplot(x='index', y='color', data=color_count)
+        plt.xlabel('Count')
+        plt.ylabel('Color')
+        plt.title('Distribution of colors')
+        st.pyplot() 
+        
+    elif selected_option == options_list[4] :
+        fuel_count = sales_df['fuel_type'].value_counts().reset_index()
+        
+        plt.figure(figsize=(8, 8))
+        sns.barplot(x='index', y='fuel_type', data=fuel_count)
+        plt.xlabel('Count')
+        plt.ylabel('Fuel')
+        plt.title('Distribution of colors')
+        st.pyplot()
+        
+    elif selected_option == options_list[5] :
+        
+        with open('../Model/ETR_car_sales.pkl', 'rb') as file:
+            model = pickle.load(file)
+        
+        X_test = pd.read_pickle('../Model/test_data.pkl')
+        predictions = model.predict(X_test)
+        predictions = pd.DataFrame(predictions, columns=['predictions'])
+        predictions = predictions.sort_values(by = 'predictions').reset_index()
+        
+        y_test = pd.read_pickle('../Model/test_label.pkl')
+        y_test_values = y_test.values
+        y_test_values = pd.DataFrame(y_test_values, columns=['y_test_values'])
+        y_test_values = y_test_values.sort_values(by = 'y_test_values').reset_index()
+
+        plt.scatter(predictions.index, predictions['predictions'], color='red', label='Predicted Values')
+        plt.scatter(y_test_values.index, y_test_values['y_test_values'], color='blue', label='Test Values')
+
+        plt.title('Scatter Plot of Predictions vs Test Values')
+        plt.legend()
+
+        st.pyplot()
+        
 
         
 #Tool 3 : Car finder 
