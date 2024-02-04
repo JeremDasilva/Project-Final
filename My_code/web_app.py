@@ -5,13 +5,32 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 import pandas as pd
 import numpy as np
 
+import psycopg
+from psycopg import sql
+
+import os
+from dotenv import load_dotenv, find_dotenv
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 import pickle
 
-sales_df = pd.read_csv('../Datasets/car_price_prediction-preprocess.csv')
+#Loading the dataset from the database
+load_dotenv()
+password = os.getenv('db_password')
 
+with psycopg.connect(f"dbname=Final-project user=postgres password={password}") as conn:
+    cursor = conn.cursor()
+    query = "SELECT * FROM car_sales_cleaned;"
+    cursor.execute(query)
+
+    rows = cursor.fetchall()
+
+columns = [desc[0] for desc in cursor.description]
+sales_df = pd.DataFrame(rows, columns=columns)
+
+#Formating the dataset
 def model_cleaner(model):
     try:
         model = model.split(' ')
