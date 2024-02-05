@@ -17,18 +17,21 @@ import matplotlib.pyplot as plt
 import pickle
 
 #Loading the dataset from the database
-load_dotenv()
-password = os.getenv('db_password')
+try:
+    load_dotenv()
+    password = os.getenv('db_password')
 
-with psycopg.connect(f"dbname=Final-project user=postgres password={password}") as conn:
-    cursor = conn.cursor()
-    query = "SELECT * FROM car_sales_cleaned;"
-    cursor.execute(query)
+    with psycopg.connect(f"dbname=Final-project user=postgres password={password}") as conn:
+        cursor = conn.cursor()
+        query = "SELECT * FROM car_sales_cleaned;"
+        cursor.execute(query)
 
-    rows = cursor.fetchall()
+        rows = cursor.fetchall()
 
-columns = [desc[0] for desc in cursor.description]
-sales_df = pd.DataFrame(rows, columns=columns)
+    columns = [desc[0] for desc in cursor.description]
+    sales_df = pd.DataFrame(rows, columns=columns)
+except : 
+    sales_df = pd.read_csv('../Datasets/car_price_prediction_preprocess.csv')
 
 #Formating the dataset
 def model_cleaner(model):
