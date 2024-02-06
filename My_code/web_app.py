@@ -43,7 +43,7 @@ def model_cleaner(model):
 sales_df['model'] = sales_df['model'].apply(lambda x : model_cleaner(x) )
 sales_df['turbo'] = sales_df['turbo'].replace({0: 'No', 1: 'Yes'})
 
-
+st.write(sales_df)
 #Landing page and sidebar
 st.title('Used cars market : analysis, prediction and search engine')
 
@@ -127,66 +127,86 @@ elif st.sidebar.checkbox('Data visualization') :
     
     st.markdown('## Data visualization')
     
-    options_list = ['Mean Price by Production Year', 
-                    'Distribution of Car Categories',
-                    'Distribution of Gearbox types',
-                    'Distribution of Colors',
-                    'Distribution of Fuel type',
+    options_list = ['Mean price by production year',
+                    'Top manufacturer',
+                    'Distribution of car categories',
+                    'Distribution of gearbox types',
+                    'Distribution of colors',
+                    'Distribution of fuel type',
                     'Behavior of the model']
 
     selected_option = st.sidebar.selectbox('What do you want to visualize?', options_list)
 
     if selected_option == options_list[0]:
-        sales_df_sorted = sales_df.groupby('production_year')['price'].mean().reset_index().sort_values(by='production_year')
-
         plt.figure(figsize=(10, 6))
+        sales_df_sorted = sales_df.groupby('production_year')['price'].mean().reset_index().sort_values(by='production_year')
         plt.barh(y=sales_df_sorted['production_year'], width=sales_df_sorted['price'])
         plt.xlabel('Mean Price')
         plt.ylabel('Production Year')
-        plt.title('Mean Price by Production Year')
+        plt.title(options_list[0])
+        plt.tight_layout()
+        st.pyplot()
+        
+    elif selected_option == options_list[1]:
+        plt.figure(figsize=(10, 6))
+        manufacturer_counts = sales_df['manufacturer'].value_counts().reset_index()
+        ax = sns.barplot(x='index', y='manufacturer', data=manufacturer_counts[0:11])
+        for bar in ax.patches:
+            ax.annotate(str(int(bar.get_height())), 
+                (bar.get_x() + bar.get_width() / 2., bar.get_height()), 
+                ha = 'center', va = 'center', 
+                xytext = (0, 9), 
+                textcoords = 'offset points')
+        plt.xlabel('Manufacturer')
+        plt.xticks(rotation=30, ha='right')
+        plt.ylabel('Count')
+        plt.title(options_list[1])
+        plt.tight_layout()
         st.pyplot()
 
-    elif selected_option == options_list[1]:
+    elif selected_option == options_list[2]:
         category_counts = sales_df['category'].value_counts().reset_index()
-        
         plt.figure(figsize=(10, 6))
-        sns.barplot(x='index', y='category', data=category_counts)
-        plt.xlabel('Count')
-        plt.ylabel('Category')
-        plt.title('Distribution of Car Categories')
+        sns.barplot(x='index', y='category', data=category_counts[0:6])
+        plt.xlabel('Category')
+        plt.xticks(rotation=30, ha='right')
+        plt.ylabel('Count')
+        plt.title(options_list[2])
+        plt.tight_layout()
         st.pyplot()
         
-    elif selected_option == options_list[2] :
-        gearbox_count = sales_df['gearbox_type'].value_counts().reset_index()
-        
-        plt.figure(figsize=(8, 8))
-        sns.barplot(x='index', y='gearbox_type', data=gearbox_count)
-        plt.xlabel('Count')
-        plt.ylabel('Gear box')
-        plt.title('Distribution of Gearbox Types')
-        st.pyplot() 
-        
     elif selected_option == options_list[3] :
-        color_count = sales_df['color'].value_counts().reset_index()
-        
-        plt.figure(figsize=(8, 8))
-        sns.barplot(x='index', y='color', data=color_count)
-        plt.xlabel('Count')
-        plt.ylabel('Color')
-        plt.title('Distribution of colors')
+        gearbox_count = sales_df['gearbox_type'].value_counts().reset_index()
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x='index', y='gearbox_type', data=gearbox_count)
+        plt.xlabel('Gear box')
+        plt.ylabel('Count')
+        plt.title(options_list[3])
+        plt.tight_layout()
         st.pyplot() 
         
     elif selected_option == options_list[4] :
-        fuel_count = sales_df['fuel_type'].value_counts().reset_index()
+        color_count = sales_df['color'].value_counts().reset_index()
+        plt.figure(figsize=(10, 6))
+        unique_colors = color_count['index'].tolist()
+        palette = sns.color_palette("husl", len(unique_colors))
+        sns.barplot(x='index', y='color', data=color_count[0:11], palette=palette)
+        plt.xlabel('Color')
+        plt.ylabel('Count')
+        plt.title(options_list[4])
+        plt.tight_layout()
+        st.pyplot() 
         
+    elif selected_option == options_list[5] :
+        fuel_count = sales_df['fuel_type'].value_counts().reset_index()
         plt.figure(figsize=(8, 8))
         sns.barplot(x='index', y='fuel_type', data=fuel_count)
         plt.xlabel('Count')
         plt.ylabel('Fuel')
-        plt.title('Distribution of colors')
+        plt.title(options_list[5])
         st.pyplot()
         
-    elif selected_option == options_list[5] :
+    elif selected_option == options_list[6] :
         
         with open('../Model/ETR_car_sales.pkl', 'rb') as file:
             model = pickle.load(file)
@@ -201,15 +221,13 @@ elif st.sidebar.checkbox('Data visualization') :
         y_test_values = pd.DataFrame(y_test_values, columns=['y_test_values'])
         y_test_values = y_test_values.sort_values(by = 'y_test_values').reset_index()
 
+        plt.figure(figsize=(10, 6))
         plt.scatter(predictions.index, predictions['predictions'], color='red', label='Predicted Values')
         plt.scatter(y_test_values.index, y_test_values['y_test_values'], color='blue', label='Test Values')
-
-        plt.title('Scatter Plot of Predictions vs Test Values')
+        plt.ylabel('Price')
+        plt.title(options_list[6])
         plt.legend()
-
         st.pyplot()
-        
-
         
 #Tool 3 : Car finder 
 elif st.sidebar.checkbox('Car Finder') :
