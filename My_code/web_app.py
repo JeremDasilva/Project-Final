@@ -8,8 +8,8 @@ import numpy as np
 #import psycopg
 #from psycopg import sql
 
-import os
-from dotenv import load_dotenv, find_dotenv
+#import os
+#from dotenv import load_dotenv, find_dotenv
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -19,7 +19,7 @@ import pickle
 import openai
 
 #Loading the dataset from the database or csv
-try:
+'''try:
     load_dotenv()
     password = os.getenv('db_password')
 
@@ -32,8 +32,8 @@ try:
 
     columns = [desc[0] for desc in cursor.description]
     sales_df = pd.DataFrame(rows, columns=columns)
-except : 
-    sales_df = pd.read_csv('../Datasets/car_price_prediction_preprocess.csv')
+except :''' 
+sales_df = pd.read_csv('../Datasets/car_price_prediction_preprocess.csv')
 
 #Formating the dataset
 def model_cleaner(model):
