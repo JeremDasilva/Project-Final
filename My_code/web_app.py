@@ -70,10 +70,10 @@ if st.sidebar.checkbox('Prediction Model'):
     #User interface for input parameters
     X_pred = {}
     
-    options_list_manufacturer = list(sorted(sales_df['manufacturer'].unique()))
+    options_list_manufacturer = list(sorted(sales_df_prediction['manufacturer'].unique()))
     selected_manufacturer = st.sidebar.selectbox('manufacturer', options_list_manufacturer)
     X_pred['manufacturer'] = selected_manufacturer    
-    filtered_df_manufacturer = sales_df[sales_df['manufacturer'] == selected_manufacturer]
+    filtered_df_manufacturer = sales_df_prediction[sales_df_prediction['manufacturer'] == selected_manufacturer]
 
     options_list_model = list(sorted(filtered_df_manufacturer['model'].unique()))
     X_pred['model'] = st.sidebar.selectbox('model', options_list_model)
@@ -274,7 +274,7 @@ elif st.sidebar.checkbox('Car insights') :
     
     st.write(content)
     if st.button("Yes!", key = 'insigths'):
-        st.write("It may takes some time to load ...")        
+        st.write("It may take some time to load ...")        
         completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -286,7 +286,7 @@ elif st.sidebar.checkbox('Car insights') :
     st.write('Click on the button below if you want to know more about this car')
     content_issues = content + ' And the most common issue this car has'
     if st.button("Let's find out!", key = 'issues'):
-        st.write("It may takes some time to load ...")
+        st.write("It may take some time to load ...")
         completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
