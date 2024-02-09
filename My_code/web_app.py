@@ -33,7 +33,7 @@ import openai
     columns = [desc[0] for desc in cursor.description]
     sales_df = pd.DataFrame(rows, columns=columns)
 except :''' 
-sales_df = pd.read_csv('../Datasets/car_price_prediction_preprocess.csv')
+sales_df = pd.read_csv('../Datasets/car_price_prediction-preprocess.csv')
 
 #Formating the dataset
 def model_cleaner(model):
