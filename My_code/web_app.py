@@ -16,7 +16,9 @@ import matplotlib.pyplot as plt
 
 import pickle
 
-#Loading the dataset from the database
+import openai
+
+#Loading the dataset from the database or csv
 try:
     load_dotenv()
     password = os.getenv('db_password')
@@ -43,7 +45,6 @@ def model_cleaner(model):
 sales_df['model'] = sales_df['model'].apply(lambda x : model_cleaner(x) )
 sales_df['turbo'] = sales_df['turbo'].replace({0: 'No', 1: 'Yes'})
 
-st.write(sales_df)
 #Landing page and sidebar
 st.title('Used cars market : analysis, prediction and search engine')
 
@@ -70,9 +71,9 @@ if st.sidebar.checkbox('Prediction Model'):
     X_pred = {}
     
     options_list_manufacturer = list(sorted(sales_df['manufacturer'].unique()))
-    selected_option_manufacturer = st.sidebar.selectbox('manufacturer', options_list_manufacturer)
-    X_pred['manufacturer'] = selected_option_manufacturer    
-    filtered_df_manufacturer = sales_df[sales_df['manufacturer'] == selected_option_manufacturer]
+    selected_manufacturer = st.sidebar.selectbox('manufacturer', options_list_manufacturer)
+    X_pred['manufacturer'] = selected_manufacturer    
+    filtered_df_manufacturer = sales_df[sales_df['manufacturer'] == selected_manufacturer]
 
     options_list_model = list(sorted(filtered_df_manufacturer['model'].unique()))
     X_pred['model'] = st.sidebar.selectbox('model', options_list_model)
@@ -235,11 +236,61 @@ elif st.sidebar.checkbox('Car Finder') :
     st.markdown('## Car Finder')
     
     options_list_manufacturer = list(sorted(sales_df['manufacturer'].unique()))
-    selected_option_manufacturer = st.sidebar.selectbox('Which Manufacturer are you looking for?', options_list_manufacturer)
-    filtered_df_manufacturer = sales_df[sales_df['manufacturer'] == selected_option_manufacturer]
+    selected_manufacturer = st.sidebar.selectbox('Which Manufacturer are you looking for?', options_list_manufacturer)
+    filtered_df_manufacturer = sales_df[sales_df['manufacturer'] == selected_manufacturer]
 
     options_list_model = list(sorted(filtered_df_manufacturer['model'].unique()))
-    selected_option_model = st.sidebar.selectbox('Which model are you looking for?', options_list_model)
-    filtered_df_model = filtered_df_manufacturer[filtered_df_manufacturer['model'] == selected_option_model]
+    selected_model = st.sidebar.selectbox('Which model are you looking for?', options_list_model)
+    filtered_df_model = filtered_df_manufacturer[filtered_df_manufacturer['model'] == selected_model]
 
     st.write(filtered_df_model)
+    
+#Car insights with OpenAI
+elif st.sidebar.checkbox('Car insights') :
+    
+    #Manufacturer
+    options_list_manufacturer = list(sorted(sales_df['manufacturer'].unique()))
+    selected_manufacturer = st.sidebar.selectbox('manufacturer', options_list_manufacturer)   
+    filtered_df_manufacturer = sales_df[sales_df['manufacturer'] == selected_manufacturer]
+
+    #Model
+    options_list_model = list(sorted(filtered_df_manufacturer['model'].unique()))
+    selected_model = st.sidebar.selectbox('model', options_list_model) 
+    
+    #Year
+    year_selected = st.sidebar.slider('year manufactured', 1950, 2024)
+    
+    #Fuel type
+    options_list_fuel = list(sorted(sales_df['fuel_type'].unique()))
+    selected_fuel = st.sidebar.selectbox('fuel type', options_list_fuel) 
+    
+    #Creating the query
+    load_dotenv()
+    API_KEY = os.getenv('open_ai_api')
+    client = openai
+    client.api_key = API_KEY
+    
+    content = f"Can you tell me more about {selected_manufacturer} {selected_model} {year_selected} {selected_fuel} ?"
+    
+    st.write(content)
+    if st.button("Yes!", key = 'insigths'):
+        st.write("It may takes some time to load ...")        
+        completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": content}
+            ]
+        )
+        st.write(completion.choices[0].message.content)
+        
+    st.write('Click on the button below if you want to know more about this car')
+    content_issues = content + ' And the most common issue this car has'
+    if st.button("Let's find out!", key = 'issues'):
+        st.write("It may takes some time to load ...")
+        completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": content_issues}
+            ]
+        )
+        st.write(completion.choices[0].message.content)
