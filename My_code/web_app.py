@@ -5,8 +5,8 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 import pandas as pd
 import numpy as np
 
-import psycopg
-from psycopg import sql
+#import psycopg
+#from psycopg import sql
 
 import os
 from dotenv import load_dotenv, find_dotenv
